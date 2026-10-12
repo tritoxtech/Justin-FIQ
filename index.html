@@ -326,7 +326,7 @@ function analyze(t,filename){
  if(!auto)add(false,'Auto quote','Auto section present','Missing');else{
  dateCheck(auto,'Auto');const farmers=!/Bristol\s+West\s+Auto\s+quote/i.test(auto);const carrier=farmers?'Farmers':'Bristol West';
  if(farmers)add(!/Signal\s+by\s+Farmers/i.test(auto),'Signal by Farmers','Removed');
- const tort=field(auto,/Limited\s+tort/i);const tortYes=/^(?:Yes|Included|Selected)\b/i.test(tort)||/Tort\s*(?:option|selection)?\s*[:–—-]?\s*Limited\b/i.test(auto);add(tortYes,'Limited Tort','Yes',tortYes?'Yes':tort||'Not found');
+ const tort=field(auto,farmers?/Limited\s+tort/i:/\bTORT\b/i);const tortYes=farmers?(/^(?:Yes|Included|Selected|Limited)\b/i.test(tort)||/Tort\s*(?:option|selection)?\s*[:–—-]?\s*Limited\b/i.test(auto)):/^Limited\b/i.test(tort);add(tortYes,'Limited Tort',farmers?'Yes / Limited':'Limited',tortYes?(farmers?'Yes':'Limited'):tort||'Not found');
  vehicles=extractVehicles(auto);if(!vehicles.length)add(false,'Vehicles','Detect every vehicle','No vehicles detected',true);
  const heads=[...auto.matchAll(/(?:^|\n)[ \t]*((?:19|20)\d{2})[ \t]+([^\n]{3,120}?)(?:[ \t]*\(VIN\b[^\n]*\)|[ \t]*(?=\n\s*Coverage\b))/gi)];
  for(const v of vehicles){const modelKey=s=>s.toLowerCase().replace(/\.{2,}|…/g,'').replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).slice(0,2).join(' ');const short=modelKey(v.model);const h=heads.find(x=>+x[1]===v.year&&modelKey(x[2]).startsWith(short));let section='';if(h){const end=heads.find(x=>x.index>h.index)?.index??auto.length;section=auto.slice(h.index,end);}const title=v.year+' '+v.model;
