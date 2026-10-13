@@ -355,8 +355,6 @@ function extractJustinPremiums(t){
  const p3=a.match(/1\s+Pay\s+\$([\d,]+\.?\d*)/i);
  let raw=p1?Number(num(p1[2])):p2?Number(num(p2[2])):p3?Number(num(p3[1])):null;
  if(raw!==null&&Number.isFinite(raw)){
-   const fee=a.match(/\*?Includes\s+\$([\d,]+(?:\.\d{1,2})?)\s+(?:in\s+fees|Membership\s+fee)/i);
-   raw-=fee?Number(num(fee[1])):0;
    full=String(Math.round(raw*100)/100);
  }
  if(!full){m=a.match(/Paid\s+in\s+full[^$0-9]{0,80}\$?\s*([\d,]+(?:\.\d{1,2})?)/i);if(m)full=num(m[1]);}
@@ -366,15 +364,10 @@ function extractJustinPremiums(t){
    const h=t.slice(homeAt);
    const h1=h.match(/1\s+Pay\s+\$([\d,]+\.?\d*)\s+-?\s*\$([\d,]+\.?\d*)/i)||h.match(/1\s+Pay\s+\$([\d,]+\.?\d*)/i);
    let homeRaw=h1?Number(num(h1[2]||h1[1])):null;
-   let includesFee=homeRaw>0;
    if(!(homeRaw>0)){const totalFees=h.match(/Total\s+premium\s+w\/?fees[\s\S]{0,80}?\$([\d,]+(?:\.\d{1,2})?)/i);homeRaw=totalFees?Number(num(totalFees[1])):null;}
-   if(homeRaw>0)includesFee=true;
    if(!(homeRaw>0)){const summary=h.match(/Risk\s+address[\s\S]{0,120}?Total\s+premium\*?[\s\S]{0,600}?\$([\d,]+(?:\.\d{1,2})?)/i);homeRaw=summary?Number(num(summary[1])):null;}
-   if(homeRaw>0)includesFee=true;
    if(!(homeRaw>0)){const term=h.match(/Term\s+Premium[\s\S]{0,80}?\$([\d,]+(?:\.\d{1,2})?)/i);homeRaw=term?Number(num(term[1])):null;}
    if(homeRaw!==null&&Number.isFinite(homeRaw)){
-     const homeFee=h.match(/\*?Includes\s+\$([\d,]+(?:\.\d{1,2})?)\s+(?:in\s+fees|Membership\s+fee|(?:other\s+)?fees?)/i);
-     homeRaw-=includesFee&&homeFee?Number(num(homeFee[1])):0;
      homeAnnual=String(Math.round(homeRaw*100)/100);
    }
  }
